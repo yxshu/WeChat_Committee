@@ -1,0 +1,16 @@
+如何使用ngrok在本机调试微信
+
+http://www.ngrok.cc/   7b443fb7574d88fa    http://yxshu.free.idcfengye.com/default.aspx
+
+其中vs如果用IP地址访问的话，需要进行配置：
+1、打开两个地方的applicationhost.config（
+		一个在C盘下IIS Express的安装位置C:\Users\admin\Documents\IISExpress\config，
+		第二个在项目目录下D:\OnLineTest\.vs\OnLineTest\config），
+2、找到如下代码：<binding protocol="http" bindingInformation="*:2736:localhost" />
+                 
+3、在下面新增一条： <binding protocol="http" bindingInformation="*:80:192.168.14.99" />
+
+4、以管理员方式打开VS就可以访问了（可以查看右下角IIS Express能看到两条记录即为成功）
+
+
+
