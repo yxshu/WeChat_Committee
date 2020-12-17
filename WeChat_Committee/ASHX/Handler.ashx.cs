@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using WeChat_Committee.Model;
+using WeChat_Committee.Uitl;
 
 namespace WeChat_Committee.ASHX
 {
@@ -13,6 +15,8 @@ namespace WeChat_Committee.ASHX
 
         public void ProcessRequest(HttpContext context)
         {
+            Common common = new Common();
+            Token access_token = common.getToken();
             context.Response.ContentType = "text/plain";
             string token = "yxshu";
             if (string.IsNullOrEmpty(token)) { return; }
