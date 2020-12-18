@@ -16,6 +16,13 @@ namespace WeChat_Committee.ASHX
         public void ProcessRequest(HttpContext context)
         {
             context.Response.ContentType = "text/html";
+            string requesttype = context.Request.RequestType.ToUpper();
+            Token token = Common.getAccess_Token();
+            switch (requesttype)
+            {
+                case "GET": return;
+                case "POST": return;
+            }
             bool configURLResult;
             string echoString = Common.ConfigURL(context, out configURLResult);
             if (configURLResult)

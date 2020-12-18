@@ -12,9 +12,14 @@ namespace WeChat_Committee.Uitl
 {
     public class HttpHelper
     {
-        /// <summary>  
+        /// <summary>
         /// 创建GET方式的HTTP请求  
-        /// </summary>  
+        /// </summary>
+        /// <param name="url">请求的地址</param>
+        /// <param name="timeout">请求的超时等待时间</param>
+        /// <param name="userAgent">如果使用代理服务器，否则为NULL</param>
+        /// <param name="cookies">是否附加cookie,没有为NULL</param>
+        /// <returns></returns>
         public static HttpWebResponse CreateGetHttpResponse(string url, int timeout, string userAgent, CookieCollection cookies)
         {
             HttpWebRequest request = null;
@@ -41,10 +46,15 @@ namespace WeChat_Committee.Uitl
             }
             return request.GetResponse() as HttpWebResponse;
         }
-
-        /// <summary>  
+        /// <summary>
         /// 创建POST方式的HTTP请求  
-        /// </summary>  
+        /// </summary>
+        /// <param name="url">请求的地址</param>
+        /// <param name="parameters">传递的参数</param>
+        /// <param name="timeout">超时等待时间</param>
+        /// <param name="userAgent">是否使用代理服务器，没有则用null</param>
+        /// <param name="cookies">是否有cookie，没有则为null</param>
+        /// <returns></returns>
         public static HttpWebResponse CreatePostHttpResponse(string url, IDictionary<string, string> parameters, int timeout, string userAgent, CookieCollection cookies)
         {
             HttpWebRequest request = null;

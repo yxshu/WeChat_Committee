@@ -12,10 +12,31 @@ namespace WeChat_Committee.Uitl
     public class Common
     {
         /// <summary>
+        /// access_token是公众号的全局唯一接口调用凭据,
+        /// 公众号调用各接口时都需使用access_token。
+        /// 开发者需要进行妥善保存。
+        /// access_token的存储至少要保留512个字符空间。
+        /// access_token的有效期目前为2个小时，需定时刷新，
+        /// 重复获取将导致上次获取的access_token失效。
         /// 
+        /// 接口调用请求说明
+        ///https请求方式: GET https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=APPID&secret=APPSECRET
+        ///参数：grant_type 	必须  	获取access_token填写client_credential
+        ///参数：appid        必须   第三方用户唯一凭证
+        ///参数：secret       必须   第三方用户唯一凭证密钥，即appsecret
+        ///
+        /// 返回说明
+        ///正常情况下，微信会返回下述JSON数据包给公众号：
+        ///{"access_token":"ACCESS_TOKEN","expires_in":7200}
+        ///access_token 	获取到的凭证
+        ///expires_in 凭证有效时间，单位：秒
+        ///
+        /// 错误时微信会返回错误码等信息，JSON数据包示例如下（该示例为AppID无效错误）:
+        ///{"errcode":40013,"errmsg":"invalid appid"}
+
         /// </summary>
         /// <returns></returns>
-        public Token getToken()
+        public static Token getAccess_Token()
         {
             string grant_type = ConfigurationManager.AppSettings["grant_type"];
             string APPID = ConfigurationManager.AppSettings["appid"];
@@ -24,8 +45,8 @@ namespace WeChat_Committee.Uitl
             HttpWebResponse httpWebResponse = HttpHelper.CreateGetHttpResponse(url, 5 * 1000, null, null);
             string responsestring = HttpHelper.GetResponseString(httpWebResponse);
             JsonSerializer jsonSerializer = new JsonSerializer();
-            Token token = (Token)jsonSerializer.Deserialize(new JsonTextReader(new System.IO.StringReader(responsestring)), typeof(Token));
-            //bool tokenInsertResult = SetAppSettingsValue("access_token", responsestring);
+            Token token = new Token();
+            token = (Token)jsonSerializer.Deserialize(new JsonTextReader(new System.IO.StringReader(responsestring)), typeof(Token));
             return token;
         }
         /// <summary>
@@ -84,10 +105,10 @@ namespace WeChat_Committee.Uitl
             else { return false; }
         }
         /// <summary>
-        /// 
+        /// 向配置文件的AppSetting字段内写入内容
         /// </summary>
-        /// <param name="key"></param>
-        /// <param name="value"></param>
+        /// <param name="key">键</param>
+        /// <param name="value">值</param>
         /// <returns></returns>
         private static bool SetAppSettingsValue(string key, string value)
         {

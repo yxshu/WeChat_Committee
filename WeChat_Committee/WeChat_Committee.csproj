@@ -209,6 +209,7 @@
     </Compile>
     <Compile Include="Uitl\Common.cs" />
     <Compile Include="Uitl\HttpHelper.cs" />
+    <Compile Include="Uitl\RequestType.cs" />
     <Compile Include="ViewSwitcher.ascx.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
       <SubType>ASPXCodeBehind</SubType>
