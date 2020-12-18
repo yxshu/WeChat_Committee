@@ -207,7 +207,7 @@
     <Compile Include="Site.Mobile.Master.designer.cs">
       <DependentUpon>Site.Mobile.Master</DependentUpon>
     </Compile>
-    <Compile Include="Uitl\getAccess_token.cs" />
+    <Compile Include="Uitl\Common.cs" />
     <Compile Include="Uitl\HttpHelper.cs" />
     <Compile Include="ViewSwitcher.ascx.cs">
       <DependentUpon>ViewSwitcher.ascx</DependentUpon>
