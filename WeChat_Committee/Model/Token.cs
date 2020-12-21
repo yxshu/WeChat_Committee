@@ -5,6 +5,11 @@ using System.Web;
 
 namespace WeChat_Committee.Model
 {
+    /// <summary>
+    /// 正常情况下，微信会返回下述JSON数据包给公众号：
+    ///{"access_token":"ACCESS_TOKEN","expires_in":7200}
+    ///新增了一个属性：DateTime  createtime 获取的时间
+    /// </summary>
     public class Token
     {
         private string access_token;

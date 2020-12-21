@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.SessionState;
 using WeChat_Committee.Model;
 using WeChat_Committee.Uitl;
 
@@ -10,7 +11,7 @@ namespace WeChat_Committee.ASHX
     /// <summary>
     /// Handler 的摘要说明
     /// </summary>
-    public class Handler : IHttpHandler
+    public class Handler : IHttpHandler,IRequiresSessionState
     {
 
         public void ProcessRequest(HttpContext context)
