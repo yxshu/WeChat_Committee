@@ -9,6 +9,7 @@ using WeChat_Committee.Model;
 using WeChat_Committee.Uitl;
 using System.Data.SqlClient;
 using System.Text;
+using System.Data;
 
 namespace WeChat_Committee.Uitl
 {
@@ -62,8 +63,18 @@ namespace WeChat_Committee.Uitl
         /// <returns></returns>
         public static Token getAccess_Token()
         {
-            Token token = (Token)DBHelper.DbHelperSQL.GetSingle("select top(1)* from Token order by createtime desc");
-            if (token != null && DateTime.Now > token.Createtime.AddSeconds(token.Expires_in + 300)) return token;
+            DataSet dataSet = DBHelper.DbHelperSQL.Query("select top(1)* from Token order by createtime desc");
+            Token token = null;
+            if (dataSet.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
+            {
+                token = new Token();
+                DataRow dr = dataSet.Tables[0].Rows[0];
+                token.Id = (Int32)dr["Id"];
+                token.Access_token = dr["access_token"].ToString();
+                token.Expires_in = (Int32)dr["expires_in"];
+                token.Createtime = (DateTime)dr["createtime"];
+            }
+            if (token != null && DateTime.Now < token.Createtime.AddSeconds(token.Expires_in + 300)) return token;
             string grant_type = ConfigurationManager.AppSettings["grant_type"];
             string APPID = ConfigurationManager.AppSettings["appid"];
             string APPSECRET = ConfigurationManager.AppSettings["APPSECRET"];
@@ -73,15 +84,15 @@ namespace WeChat_Committee.Uitl
             JsonSerializer jsonSerializer = new JsonSerializer();
             token = (Token)jsonSerializer.Deserialize(new JsonTextReader(new System.IO.StringReader(responsestring)), typeof(Token));
             SqlParameter[] sqlparameters = {
-                new SqlParameter("@access_token",System.Data.SqlDbType.VarChar,200),
-                new SqlParameter("@expires_in",System.Data.SqlDbType.Int,4),
+                new SqlParameter("@access_token",System.Data.SqlDbType.Text),
+                new SqlParameter("@expires_in",System.Data.SqlDbType.Int),
                 new SqlParameter("@createtime",System.Data.SqlDbType.DateTime)
             };
             sqlparameters[0].Value = token.Access_token;
             sqlparameters[1].Value = token.Expires_in;
             sqlparameters[2].Value = token.Createtime;
             StringBuilder sql = new StringBuilder("insert into Token(access_token,expires_in,createtime) ");
-            sql.Append("values('@access_token','@expires_in','@createtime')");
+            sql.Append("values(@access_token,@expires_in,@createtime)");
             int rows = DBHelper.DbHelperSQL.ExecuteSql(sql.ToString(), sqlparameters);
             return token;
         }

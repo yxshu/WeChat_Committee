@@ -12,8 +12,9 @@ namespace WeChat_Committee.Model
     /// </summary>
     public class Token
     {
+        private int id;
         private string access_token;
-        private int expires_in;
+        private Int32 expires_in;
         private DateTime createtime;
         /// <summary>
         /// 接口调用请求说明
@@ -66,7 +67,13 @@ namespace WeChat_Committee.Model
         /// <summary>
         /// 凭证有效时间，单位：秒
         /// </summary>
-        public int Expires_in { get => expires_in; set => expires_in = value; }
+        public Int32 Expires_in { get => expires_in; set => expires_in = value; }
         public DateTime Createtime { get => createtime; set => createtime = value; }
+        public int Id { get => id; set => id = value; }
+
+        public override string ToString()
+        {
+            return String.Format("ACCESS_TOKEN:id:{0},access_token:{1},expires_in:{2},create_time:{3},current_time:{4}", this.Id, this.Access_token, this.Expires_in, this.Createtime, DateTime.Now);
+        }
     }
 }
