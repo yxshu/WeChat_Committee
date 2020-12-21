@@ -6,6 +6,9 @@ using System.Configuration;
 using System.Net;
 using Newtonsoft.Json;
 using WeChat_Committee.Model;
+using WeChat_Committee.Uitl;
+using System.Data.SqlClient;
+using System.Text;
 
 namespace WeChat_Committee.Uitl
 {
@@ -31,6 +34,9 @@ namespace WeChat_Committee.Uitl
 
         }
         /// <summary>
+        /// 首先从数据库中查询最近的access_token,如果没有过期（有效期超过5分钟为准），则直接返回
+        /// 如果不存在，或者已经过期，则重新申请access_token并将其写入数据库
+        /// 
         /// access_token是公众号的全局唯一接口调用凭据,
         /// 公众号调用各接口时都需使用access_token。
         /// 开发者需要进行妥善保存。
@@ -52,11 +58,12 @@ namespace WeChat_Committee.Uitl
         ///
         /// 错误时微信会返回错误码等信息，JSON数据包示例如下（该示例为AppID无效错误）:
         ///{"errcode":40013,"errmsg":"invalid appid"}
-
         /// </summary>
         /// <returns></returns>
         public static Token getAccess_Token()
         {
+            Token token = (Token)DBHelper.DbHelperSQL.GetSingle("select top(1)* from Token order by createtime desc");
+            if (token != null && DateTime.Now > token.Createtime.AddSeconds(token.Expires_in + 300)) return token;
             string grant_type = ConfigurationManager.AppSettings["grant_type"];
             string APPID = ConfigurationManager.AppSettings["appid"];
             string APPSECRET = ConfigurationManager.AppSettings["APPSECRET"];
@@ -64,11 +71,21 @@ namespace WeChat_Committee.Uitl
             HttpWebResponse httpWebResponse = HttpHelper.CreateGetHttpResponse(url, 5 * 1000, null, null);
             string responsestring = HttpHelper.GetResponseString(httpWebResponse);
             JsonSerializer jsonSerializer = new JsonSerializer();
-            Token token = new Token();
             token = (Token)jsonSerializer.Deserialize(new JsonTextReader(new System.IO.StringReader(responsestring)), typeof(Token));
-            
+            SqlParameter[] sqlparameters = {
+                new SqlParameter("@access_token",System.Data.SqlDbType.VarChar,200),
+                new SqlParameter("@expires_in",System.Data.SqlDbType.Int,4),
+                new SqlParameter("@createtime",System.Data.SqlDbType.DateTime)
+            };
+            sqlparameters[0].Value = token.Access_token;
+            sqlparameters[1].Value = token.Expires_in;
+            sqlparameters[2].Value = token.Createtime;
+            StringBuilder sql = new StringBuilder("insert into Token(access_token,expires_in,createtime) ");
+            sql.Append("values('@access_token','@expires_in','@createtime')");
+            int rows = DBHelper.DbHelperSQL.ExecuteSql(sql.ToString(), sqlparameters);
             return token;
         }
+
         /// <summary>
         /// 配置微信公众号自有服务器地址
         /// 开发者提交信息后，微信服务器将发送GET请求到填写的服务器地址URL上，
@@ -80,6 +97,7 @@ namespace WeChat_Committee.Uitl
         /// <param name="context">微信服务器发送的Get请求上下文对象</param>
         /// <param name="result">输出参数，验证是否成功的标识</param>
         /// <returns>返回一个string，用于回复，成功则按要求返回echoString，不成功则返回null</returns>
+
         public static string ConfigURL(HttpContext context, out bool result)
         {
             string token = ConfigurationManager.AppSettings["token"];
@@ -99,6 +117,7 @@ namespace WeChat_Committee.Uitl
             }
             return null;
         }
+
         /// <summary>
         /// 验证微信签名
         /// 
@@ -111,6 +130,7 @@ namespace WeChat_Committee.Uitl
         /// <param name="timestamp"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>
+
         private static bool checkSignature(string token, string signature, string timestamp, string nonce)
         {
             string[] ArrTmp = { token, timestamp, nonce };

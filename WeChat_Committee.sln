@@ -5,7 +5,12 @@ VisualStudioVersion = 16.0.30621.155
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WeChat_Committee", "WeChat_Committee\WeChat_Committee.csproj", "{2763396C-D562-42BE-85F9-A74049E47A03}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConsoleApp_WeChat_Committee", "ConsoleApp_WeChat_Committee\ConsoleApp_WeChat_Committee.csproj", "{9388FBA5-C82C-4E15-8F1B-15D45972862B}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ConsoleApp_WeChat_Committee", "ConsoleApp_WeChat_Committee\ConsoleApp_WeChat_Committee.csproj", "{9388FBA5-C82C-4E15-8F1B-15D45972862B}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3EF39EF9-ED9F-429E-B3CC-ED996D4DC315}"
+	ProjectSection(SolutionItems) = preProject
+		.editorconfig = .editorconfig
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
