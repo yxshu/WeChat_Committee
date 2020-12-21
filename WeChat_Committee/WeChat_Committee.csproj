@@ -125,6 +125,7 @@
     <Content Include="Content\bootstrap-theme.min.css.map" />
     <Content Include="Content\bootstrap-theme.css.map" />
     <Content Include="ASHX\Handler.ashx" />
+    <None Include="Properties\PublishProfiles\长江紫都三期业主委涡会公众号-192.168.14.89.pubxml" />
     <None Include="Scripts\jquery-3.4.1.intellisense.js" />
     <Content Include="NGROK\如何使用ngrok在本机调试微信.txt" />
     <Content Include="Scripts\bootstrap.js" />
@@ -245,11 +246,12 @@
         <WebProjectProperties>
           <UseIIS>True</UseIIS>
           <AutoAssignPort>True</AutoAssignPort>
-          <DevelopmentServerPort>49380</DevelopmentServerPort>
-          <DevelopmentServerVPath>/</DevelopmentServerVPath>
-          <IISUrl>https://localhost:44355/</IISUrl>
-          <OverrideIISAppRootUrl>True</OverrideIISAppRootUrl>
-          <IISAppRootUrl>https://localhost:44355/</IISAppRootUrl>
+          <DevelopmentServerPort>0</DevelopmentServerPort>
+          <DevelopmentServerVPath>
+          </DevelopmentServerVPath>
+          <IISUrl>http://localhost:51520/</IISUrl>
+          <OverrideIISAppRootUrl>false</OverrideIISAppRootUrl>
+          <IISAppRootUrl></IISAppRootUrl>
           <NTLMAuthentication>False</NTLMAuthentication>
           <UseCustomServer>False</UseCustomServer>
           <CustomServerUrl>

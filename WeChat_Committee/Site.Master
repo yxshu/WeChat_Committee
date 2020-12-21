@@ -63,7 +63,7 @@
             </asp:ContentPlaceHolder>
             <hr />
             <footer>
-                <p>&copy; <%: DateTime.Now.Year %> - 湖北省武汉市长江紫都三期业主委员会</p>
+                <p>版权所有：&copy; <%: DateTime.Now.Year %> - 湖北省武汉市长江紫都三期业主委员会</p>
             </footer>
         </div>
 
