@@ -32,7 +32,7 @@ namespace WeChat_Committee.Uitl
         /// <returns></returns>
         public static void querySelfmenuInfo()
         {
-
+            ///https://www.cnblogs.com/zskbll/p/4164079.html
         }
         /// <summary>
         /// 首先从数据库中查询最近的access_token,如果没有过期（有效期超过5分钟为准），则直接返回
