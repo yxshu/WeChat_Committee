@@ -245,6 +245,7 @@
     <Compile Include="DBHelper\DbHelperSQL.cs" />
     <Compile Include="DBHelper\DbHelperSQL2.cs" />
     <Compile Include="DBHelper\DESEncrypt.cs" />
+    <Compile Include="Uitl\GeneralUtil.cs" />
     <Compile Include="Uitl\HttpHelper.cs" />
     <Compile Include="DBHelper\OracleHelper.cs" />
     <Compile Include="DBHelper\PubConstant.cs" />

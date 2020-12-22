@@ -67,12 +67,13 @@ namespace WeChat_Committee.Uitl
             Token token = null;
             if (dataSet.Tables.Count > 0 && dataSet.Tables[0].Rows.Count > 0)
             {
-                token = new Token();
-                DataRow dr = dataSet.Tables[0].Rows[0];
-                token.Id = (Int32)dr["Id"];
-                token.Access_token = dr["access_token"].ToString();
-                token.Expires_in = (Int32)dr["expires_in"];
-                token.Createtime = (DateTime)dr["createtime"];
+                token = GeneralUtil.GetModelByDataRow<Token>(dataSet.Tables[0].Rows[0]);
+                //token = new Token();
+                //DataRow dr = dataSet.Tables[0].Rows[0];
+                //token.Id = (Int32)dr["Id"];
+                //token.Access_token = dr["access_token"].ToString();
+                //token.Expires_in = (Int32)dr["expires_in"];
+                //token.Createtime = (DateTime)dr["createtime"];
             }
             if (token != null && DateTime.Now < token.Createtime.AddSeconds(token.Expires_in + 300)) return token;
             string grant_type = ConfigurationManager.AppSettings["grant_type"];

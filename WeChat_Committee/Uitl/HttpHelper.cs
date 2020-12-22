@@ -122,7 +122,7 @@ namespace WeChat_Committee.Uitl
         }
 
         /// <summary>
-        /// 验证证书
+        /// 如果是Https请求的话，需要对服务端证书进行有效性校验
         /// </summary>
         private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
         {
