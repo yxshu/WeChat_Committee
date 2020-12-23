@@ -5,6 +5,8 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Web;
+using System.Xml.Linq;
+using WeChat_Committee.Model;
 
 namespace WeChat_Committee.Uitl
 {
@@ -13,6 +15,7 @@ namespace WeChat_Committee.Uitl
     /// </summary>
     public class GeneralUtil
     {
+
         /// <summary>
         /// 通过DataRow 填充实体
         /// </summary>

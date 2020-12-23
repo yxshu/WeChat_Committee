@@ -6,12 +6,12 @@ using System.Web;
 
 namespace WeChat_Committee.Model
 {
-    public class MenuRoot
-    {
+    public class BaseMenu
+            {
         MENUTYPE menutype;
         string name;
 
-        public MenuRoot(MENUTYPE menutype, string name)
+        public BaseMenu(MENUTYPE menutype, string name)
         {
             this.menutype = menutype;
             this.name = name;

@@ -5,6 +5,14 @@ using System.Web;
 
 namespace WeChat_Committee.Model
 {
+    public class Menus : BaseMenu
+    {
+        public Menus(MENUTYPE menutype, string name) : base(menutype, name)
+        {
+            this.Menutype = menutype;
+            this.Name = name;
+        }
+    }
     /// <summary>
     /// 自定义菜单接口可实现多种类型按钮，如下：
     ///  click：点击推事件用户点击click类型按钮后，微信服务器会通过消息接口推送消息类型为event的结构给开发者（参考消息接口指南），并且带上按钮中开发者填写的key值，开发者可以通过自定义的key值与用户进行交互；
@@ -12,10 +20,10 @@ namespace WeChat_Committee.Model
     /// "name":"今日歌曲",
     /// "key":"V1001_TODAY_MUSIC"
     /// </summary>
-    public class ClickMenu : MenuRoot
+    public class ClickMenus : BaseMenu
     {
         string key;
-        public ClickMenu(MENUTYPE menutype, string name) : base(menutype, name)
+        public ClickMenus(MENUTYPE menutype, string name) : base(menutype, name)
         {
 
             this.Menutype = menutype;
@@ -32,7 +40,7 @@ namespace WeChat_Committee.Model
     ///"name":"搜索",
     ///"url":"http://www.soso.com/"
     /// </summary>
-    public class VIEWMenu : MenuRoot
+    public class VIEWMenu : BaseMenu
     {
         string url;
         public VIEWMenu(MENUTYPE menutype, string name) : base(menutype, name)
@@ -53,7 +61,7 @@ namespace WeChat_Committee.Model
     ///"key": "rselfmenu_0_1", 
     ///"sub_button": [ ]
     /// </summary>
-    public class SCANCODE_PUSHMenu : MenuRoot
+    public class SCANCODE_PUSHMenu : BaseMenu
     {
         string key;
         List<object> sub_button;
@@ -76,7 +84,7 @@ namespace WeChat_Committee.Model
     ///"key": "rselfmenu_0_0", 
     ///"sub_button": [ ]
     /// </summary>
-    public class CCANCODE_WAITMSGMenu : MenuRoot
+    public class CCANCODE_WAITMSGMenu : BaseMenu
     {
         string key;
         List<object> sub_button;
@@ -99,7 +107,7 @@ namespace WeChat_Committee.Model
     ///"key": "rselfmenu_1_0", 
     ///"sub_button": [ ]
     /// </summary>
-    public class PIC_SYSPHOTOMenu : MenuRoot
+    public class PIC_SYSPHOTOMenu : BaseMenu
     {
         string key;
         List<object> sub_button;
@@ -122,7 +130,7 @@ namespace WeChat_Committee.Model
     ///"key": "rselfmenu_1_1", 
     ///"sub_button": [ ]
     /// </summary>
-    public class PIC_PHOTO_OR_ALBUMMenu : MenuRoot
+    public class PIC_PHOTO_OR_ALBUMMenu : BaseMenu
     {
         string key;
         List<object> sub_button;
@@ -145,7 +153,7 @@ namespace WeChat_Committee.Model
     ///"key": "rselfmenu_1_2", 
     ///"sub_button": [ ]
     /// </summary>
-    public class PIC_WEIXINMenu : MenuRoot
+    public class PIC_WEIXINMenu : BaseMenu
     {
         string key;
         List<object> sub_button;
@@ -167,7 +175,7 @@ namespace WeChat_Committee.Model
     ///"type": "location_select", 
     ///"key": "rselfmenu_2_0"
     /// </summary>
-    public class LOCATION_SELECTMenu : MenuRoot
+    public class LOCATION_SELECTMenu : BaseMenu
     {
         string key;
         public LOCATION_SELECTMenu(MENUTYPE menutype, string name) : base(menutype, name)
@@ -187,7 +195,7 @@ namespace WeChat_Committee.Model
     ///"name": "图片", 
     ///"media_id": "MEDIA_ID1"
     /// </summary>
-    public class MEDIA_IDMenu : MenuRoot
+    public class MEDIA_IDMenu : BaseMenu
     {
         string media_id;
         public MEDIA_IDMenu(MENUTYPE menutype, string name) : base(menutype, name)
@@ -207,7 +215,7 @@ namespace WeChat_Committee.Model
     ///"name": "图文消息", 
     ///"media_id": "MEDIA_ID2"
     /// </summary>
-    public class VIEW_LIMITEDMenu : MenuRoot
+    public class VIEW_LIMITEDMenu : BaseMenu
     {
         string media_id;
         public VIEW_LIMITEDMenu(MENUTYPE menutype, string name) : base(menutype, name)

@@ -220,9 +220,12 @@
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
-    <Compile Include="Model\ClickMenu.cs" />
-    <Compile Include="Model\MenuRoot.cs" />
+    <Compile Include="Model\BaseMessage.cs" />
+    <Compile Include="Model\Menus.cs" />
+    <Compile Include="Model\BaseMenu.cs" />
     <Compile Include="Model\MENUTYPE.cs" />
+    <Compile Include="Model\Messages.cs" />
+    <Compile Include="Model\MsgType.cs" />
     <Compile Include="Model\Token.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">

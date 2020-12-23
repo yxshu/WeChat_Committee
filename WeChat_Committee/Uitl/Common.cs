@@ -10,11 +10,124 @@ using WeChat_Committee.Uitl;
 using System.Data.SqlClient;
 using System.Text;
 using System.Data;
+using System.Xml.Linq;
 
 namespace WeChat_Committee.Uitl
 {
     public class Common
     {
+
+        /// <summary>
+        /// 数据包（如加密，需解密后传入），以基类的形式返回对应的实体。
+        /// </summary>
+        /// <param name="param"></param>
+        /// <param name="bug"></param>
+        /// <returns></returns>
+        public static BaseMessage Load(EnterParam param, bool bug = true)
+            {
+                string postStr = "";
+                Stream s = VqiRequest.GetInputStream();//此方法是对System.Web.HttpContext.Current.Request.InputStream的封装，可直接代码
+                byte[] b = new byte[s.Length];
+                s.Read(b, 0, (int)s.Length);
+                postStr = Encoding.UTF8.GetString(b);//获取微信服务器推送过来的字符串
+                var timestamp = VqiRequest.GetQueryString("timestamp");
+                var nonce = VqiRequest.GetQueryString("nonce");
+                var msg_signature = VqiRequest.GetQueryString("msg_signature");
+                var encrypt_type = VqiRequest.GetQueryString("encrypt_type");
+                string data = "";
+                if (encrypt_type == "aes")//加密模式处理
+                {
+                    param.IsAes = true;
+                    var ret = new MsgCrypt(param.token, param.EncodingAESKey, param.appid);
+                    int r = ret.DecryptMsg(msg_signature, timestamp, nonce, postStr, ref data);
+                    if (r != 0)
+                    {
+                        WxApi.Base.WriteBug("消息解密失败");
+                        return null;
+
+                    }
+                }
+                else
+                {
+                    param.IsAes = false;
+                    data = postStr;
+                }
+                if (bug)
+                {
+                    Utils.WriteTxt(data);
+                }
+                return CreateMessage(data);
+            }
+
+        /// <summary>
+        /// 根据不同的消息类型来解析对应的实体
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
+        public static BaseMessage CreateMessage(string xml)
+        {
+            XElement xdoc = XElement.Parse(xml);
+            var msgtype = xdoc.Element("MsgType").Value.ToUpper();
+            MsgType type = (MsgType)Enum.Parse(typeof(MsgType), msgtype);
+            switch (type)
+            {
+                case MsgType.TEXT: return XMLConvertObj<TextMessage>(xml);
+                case MsgType.IMAGE: return XMLConvertObj<ImgMessage>(xml);
+                case MsgType.VIDEO: return XMLConvertObj<VideoMessage>(xml);
+                case MsgType.VOICE: return XMLConvertObj<VoiceMessage>(xml);
+                case MsgType.LINK:
+                    return XMLConvertObj<LinkMessage>(xml);
+                case MsgType.LOCATION:
+                    return XMLConvertObj<LocationMessage>(xml);
+                case MsgType.EVENT://事件类型
+                    {
+
+                    }
+                    break;
+                default:
+                    return XMLConvertObj<BaseMessage>(xml);
+            }
+        }
+
+        /// <summary>
+        /// 根据微信服务器推送的消息体解析成对应的实体。
+        /// 本打算用C#自带的xml序列化发序列化的组件，结果试了下总是报什么xmls的错，
+        /// 索性用反射写了个处理方法：
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xmlstr"></param>
+        /// <returns></returns>
+        public static T XMLConvertObj<T>(string xmlstr)
+        {
+            XElement xdoc = XElement.Parse(xmlstr);
+            var type = typeof(T);
+            var t = Activator.CreateInstance<T>();
+            foreach (XElement element in xdoc.Elements())
+            {
+                var pr = type.GetProperty(element.Name.ToString());
+                if (element.HasElements)
+                {//这里主要是兼容微信新添加的菜单类型。nnd，竟然有子属性，所以这里就做了个子属性的处理
+                    foreach (var ele in element.Elements())
+                    {
+                        pr = type.GetProperty(ele.Name.ToString());
+                        pr.SetValue(t, Convert.ChangeType(ele.Value, pr.PropertyType), null);
+                    }
+                    continue;
+                }
+                if (pr.PropertyType.Name == "MsgType")//获取消息模型
+                {
+                    pr.SetValue(t, (MsgType)Enum.Parse(typeof(MsgType), element.Value.ToUpper()), null);
+                    continue;
+                }
+                if (pr.PropertyType.Name == "Event")//获取事件类型。
+                {
+                    pr.SetValue(t, (Event)Enum.Parse(typeof(Event), element.Value.ToUpper()), null);
+                    continue;
+                }
+                pr.SetValue(t, Convert.ChangeType(element.Value, pr.PropertyType), null);
+            }
+            return t;
+        }
 
         /// <summary>
         /// 查询自定义菜单
