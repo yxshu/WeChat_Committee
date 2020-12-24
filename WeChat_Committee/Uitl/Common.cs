@@ -3,6 +3,7 @@ using System;
 using System.Configuration;
 using System.Data;
 using System.Data.SqlClient;
+using System.IO;
 using System.Net;
 using System.Text;
 using System.Web;
@@ -48,6 +49,40 @@ namespace WeChat_Committee.Uitl
             }
         }
 
+        private static void WriteBug(string exceptionmessage)
+        {
+            string path = string.Empty;
+            try
+            {
+                path = ConfigurationManager.AppSettings["Logpath"];
+            }
+            catch (Exception)
+            {
+                path = @"D:\Logs";
+            }
+            if (string.IsNullOrEmpty(path))
+            { path = @"D:\Logs"; }
+            try
+            {
+                //如果日志目录不存在，则创建该目录
+                if (!Directory.Exists(path))
+                {
+                    Directory.CreateDirectory(path);
+                }
+                string logFileName = path + "\\程序日志_" + DateTime.Now.ToString("yyyy_MM_dd_HH") + ".log";
+                StringBuilder logContents = new StringBuilder();
+                logContents.AppendLine(exceptionmessage);
+                //当天的日志文件不存在则新建，否则追加内容
+                StreamWriter sw = new StreamWriter(logFileName, true, Encoding.Unicode);
+                sw.Write(DateTime.Now.ToString("yyyy-MM-dd hh:mm:sss") + "" + logContents.ToString());
+                sw.Flush();
+                sw.Close();
+            }
+            catch (Exception)
+            {
+            }
+        }
+
         /// <summary>
         /// 数据包（如加密，需解密后传入），以基类的形式返回对应的实体。
         /// </summary>
@@ -78,7 +113,7 @@ namespace WeChat_Committee.Uitl
                 int r = ret.DecryptMsg(msg_signature, timestamp, nonce, postStr, ref data);
                 if (r != 0)
                 {
-                    WxApi.Base.WriteBug("消息解密失败");
+                    WriteBug("消息解密失败");
                     return null;
 
                 }
@@ -90,7 +125,7 @@ namespace WeChat_Committee.Uitl
             }
             if (bug)
             {
-                Utils.WriteTxt(data);
+               WriteBug(data);
             }
             return MessageFactory.CreateMessage(data);
         }
@@ -311,8 +346,9 @@ namespace WeChat_Committee.Uitl
         /// </summary>
         /// <param name="datatime"></param>
         /// <returns></returns>
-        public static long ConvertDateTimeInt(DateTime datatime) {
-            DateTime start = new DateTime(1970,1,1);
+        public static long ConvertDateTimeInt(DateTime datatime)
+        {
+            DateTime start = new DateTime(1970, 1, 1);
             long totalseconds = (long)(datatime - start).TotalSeconds;
             return totalseconds;
         }
