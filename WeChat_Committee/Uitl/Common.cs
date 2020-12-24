@@ -1,21 +1,52 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
+﻿using Newtonsoft.Json;
+using System;
 using System.Configuration;
-using System.Net;
-using Newtonsoft.Json;
-using WeChat_Committee.Model;
-using WeChat_Committee.Uitl;
-using System.Data.SqlClient;
-using System.Text;
 using System.Data;
+using System.Data.SqlClient;
+using System.Net;
+using System.Text;
+using System.Web;
 using System.Xml.Linq;
+using WeChat_Committee.Model;
 
 namespace WeChat_Committee.Uitl
 {
     public class Common
     {
+
+        /// <summary>
+        /// 微信上传多媒体文件
+        /// 多媒体文件、多媒体消息的获取和调用等操作，是通过media_id来进行的。
+        /// 通过本接口，公众号可以上传或下载多媒体文件。
+        /// 但请注意，每个多媒体文件（media_id）会在上传、用户发送到微信服务器3天后自动删除，以节省服务器资源。
+        /// 上传多媒体的接口地址是：http://file.api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
+        /// 其中access_token为调用接口凭证，type是媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
+        /// 上传的多媒体文件有格式和大小限制，如下：
+
+        ///图片（image）: 1M，支持JPG格式
+        ///语音（voice）：2M，播放长度不超过60s，支持AMR\MP3格式
+        ///视频（video）：10MB，支持MP4格式
+        ///缩略图（thumb）：64KB，支持JPG格式
+        /// </summary>
+        /// <param name="filepath">文件绝对路径</param>
+        public static UpLoadedMediaInfo WxUpLoad(string filepath, string token, MediaType mt)
+        {
+            using (WebClient client = new WebClient())
+            {
+                byte[] b = client.UploadFile(string.Format("http://file.api.weixin.qq.com/cgi-bin/media/upload?access_token={0}&type={1}", token, mt.ToString()), filepath);//调用接口上传文件
+                string retdata = Encoding.Default.GetString(b);//获取返回值
+                if (retdata.Contains("media_id"))//判断返回值是否包含media_id，包含则说明上传成功，然后将返回的json字符串转换成json
+                {
+                    return JsonConvert.DeserializeObject<UpLoadedMediaInfo>(retdata);
+                }
+                else
+                {//否则，写错误日志
+
+                    WriteBug(retdata);//写错误日志
+                    return null;
+                }
+            }
+        }
 
         /// <summary>
         /// 数据包（如加密，需解密后传入），以基类的形式返回对应的实体。
@@ -24,70 +55,46 @@ namespace WeChat_Committee.Uitl
         /// <param name="bug"></param>
         /// <returns></returns>
         public static BaseMessage Load(EnterParam param, bool bug = true)
-            {
-                string postStr = "";
-                Stream s = VqiRequest.GetInputStream();//此方法是对System.Web.HttpContext.Current.Request.InputStream的封装，可直接代码
-                byte[] b = new byte[s.Length];
-                s.Read(b, 0, (int)s.Length);
-                postStr = Encoding.UTF8.GetString(b);//获取微信服务器推送过来的字符串
-                var timestamp = VqiRequest.GetQueryString("timestamp");
-                var nonce = VqiRequest.GetQueryString("nonce");
-                var msg_signature = VqiRequest.GetQueryString("msg_signature");
-                var encrypt_type = VqiRequest.GetQueryString("encrypt_type");
-                string data = "";
-                if (encrypt_type == "aes")//加密模式处理
-                {
-                    param.IsAes = true;
-                    var ret = new MsgCrypt(param.token, param.EncodingAESKey, param.appid);
-                    int r = ret.DecryptMsg(msg_signature, timestamp, nonce, postStr, ref data);
-                    if (r != 0)
-                    {
-                        WxApi.Base.WriteBug("消息解密失败");
-                        return null;
-
-                    }
-                }
-                else
-                {
-                    param.IsAes = false;
-                    data = postStr;
-                }
-                if (bug)
-                {
-                    Utils.WriteTxt(data);
-                }
-                return CreateMessage(data);
-            }
-
-        /// <summary>
-        /// 根据不同的消息类型来解析对应的实体
-        /// </summary>
-        /// <param name="xml"></param>
-        /// <returns></returns>
-        public static BaseMessage CreateMessage(string xml)
         {
-            XElement xdoc = XElement.Parse(xml);
-            var msgtype = xdoc.Element("MsgType").Value.ToUpper();
-            MsgType type = (MsgType)Enum.Parse(typeof(MsgType), msgtype);
-            switch (type)
+            string postStr = "";
+            Stream s = VqiRequest.GetInputStream();//此方法是对System.Web.HttpContext.Current.Request.InputStream的封装，可直接代码
+            byte[] b = new byte[s.Length];
+            s.Read(b, 0, (int)s.Length);
+            postStr = Encoding.UTF8.GetString(b);//获取微信服务器推送过来的字符串
+            ///然后再分别获取url中的参数：timestamp，nonce，msg_signature，encrypt_type。可以看到，在明文模式下是没有encrypt_type参数的。
+            ///兼容模式和安全模式则加入了消息体的签名与加密类型两个参数。
+            ///由于在实际的运营中，兼容模式不太可能使用，所以在此不做详细介绍了。
+            ///获取到url中的参数后，判断encrypt_type的值是否为aes，如果是则说明是使用的兼容模式或安全模式，此时则需调用解密相关的方法进行解密。
+            ///则则直接解析接收到的xml字符串。
+            var timestamp = VqiRequest.GetQueryString("timestamp");
+            var nonce = VqiRequest.GetQueryString("nonce");
+            var msg_signature = VqiRequest.GetQueryString("msg_signature");
+            var encrypt_type = VqiRequest.GetQueryString("encrypt_type");
+            string data = "";
+            if (encrypt_type == "aes")//加密模式处理
             {
-                case MsgType.TEXT: return XMLConvertObj<TextMessage>(xml);
-                case MsgType.IMAGE: return XMLConvertObj<ImgMessage>(xml);
-                case MsgType.VIDEO: return XMLConvertObj<VideoMessage>(xml);
-                case MsgType.VOICE: return XMLConvertObj<VoiceMessage>(xml);
-                case MsgType.LINK:
-                    return XMLConvertObj<LinkMessage>(xml);
-                case MsgType.LOCATION:
-                    return XMLConvertObj<LocationMessage>(xml);
-                case MsgType.EVENT://事件类型
-                    {
+                param.IsAes = true;
+                var ret = new MsgCrypt(param.token, param.EncodingAESKey, param.appid);
+                int r = ret.DecryptMsg(msg_signature, timestamp, nonce, postStr, ref data);
+                if (r != 0)
+                {
+                    WxApi.Base.WriteBug("消息解密失败");
+                    return null;
 
-                    }
-                    break;
-                default:
-                    return XMLConvertObj<BaseMessage>(xml);
+                }
             }
+            else
+            {
+                param.IsAes = false;
+                data = postStr;
+            }
+            if (bug)
+            {
+                Utils.WriteTxt(data);
+            }
+            return MessageFactory.CreateMessage(data);
         }
+
 
         /// <summary>
         /// 根据微信服务器推送的消息体解析成对应的实体。
@@ -292,6 +299,22 @@ namespace WeChat_Committee.Uitl
             ConfigurationManager.RefreshSection("appSettings");//重新加载新的配置文件  
             result = true;
             return result;
+        }
+
+        public static void ResponseWrite(string str)
+        {
+            HttpContext.Current.Response.Write(str);
+            HttpContext.Current.Response.End();
+        }
+        /// <summary>
+        /// 表示1970年1月1日0时0分0秒至输入时间所间隔的秒数
+        /// </summary>
+        /// <param name="datatime"></param>
+        /// <returns></returns>
+        public static long ConvertDateTimeInt(DateTime datatime) {
+            DateTime start = new DateTime(1970,1,1);
+            long totalseconds = (long)(datatime - start).TotalSeconds;
+            return totalseconds;
         }
     }
 }

@@ -40,4 +40,3 @@ namespace WeChat_Committee.Model
         EVENT
     }
 }
-}

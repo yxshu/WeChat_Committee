@@ -221,12 +221,16 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Model\BaseMessage.cs" />
+    <Compile Include="Model\Event.cs" />
+    <Compile Include="Model\MediaType.cs" />
     <Compile Include="Model\Menus.cs" />
     <Compile Include="Model\BaseMenu.cs" />
     <Compile Include="Model\MENUTYPE.cs" />
     <Compile Include="Model\Messages.cs" />
+    <Compile Include="Model\MsgFlag.cs" />
     <Compile Include="Model\MsgType.cs" />
     <Compile Include="Model\Token.cs" />
+    <Compile Include="Model\UpLoadedMediaInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Site.Master.cs">
       <DependentUpon>Site.Master</DependentUpon>
@@ -248,10 +252,13 @@
     <Compile Include="DBHelper\DbHelperSQL.cs" />
     <Compile Include="DBHelper\DbHelperSQL2.cs" />
     <Compile Include="DBHelper\DESEncrypt.cs" />
+    <Compile Include="Uitl\Cryptography.cs" />
     <Compile Include="Uitl\GeneralUtil.cs" />
     <Compile Include="Uitl\HttpHelper.cs" />
     <Compile Include="DBHelper\OracleHelper.cs" />
     <Compile Include="DBHelper\PubConstant.cs" />
+    <Compile Include="Uitl\MessageFactory.cs" />
+    <Compile Include="Uitl\MsgCrypt.cs" />
     <Compile Include="Uitl\RequestType.cs" />
     <Compile Include="DBHelper\SQLHelper.cs" />
     <Compile Include="ViewSwitcher.ascx.cs">

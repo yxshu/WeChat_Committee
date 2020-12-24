@@ -6,6 +6,11 @@ using System.Web;
 namespace WeChat_Committee.Model
 {
     /// <summary>
+    /// access_token的存储至少要保留512个字符空间。
+    /// access_token的有效期目前为2个小时，需定时刷新，重复获取将导致上次获取的access_token失效。
+    /// 需要注意的时，一个公众号同时只存在一个有效的access_token，开发者需要在access_token过期前，刷新access_token。
+    /// 在刷新的过程中，公众平台后台会保证在刷新短时间内，新老access_token都可用，这保证了第三方业务的平滑过渡。
+    /// 
     /// 正常情况下，微信会返回下述JSON数据包给公众号：
     ///{"access_token":"ACCESS_TOKEN","expires_in":7200}
     ///新增了一个属性：DateTime  createtime 获取的时间
