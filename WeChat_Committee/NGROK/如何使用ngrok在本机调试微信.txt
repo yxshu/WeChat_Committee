@@ -1,6 +1,8 @@
 如何使用ngrok在本机调试微信
 
-http://www.ngrok.cc/   7b443fb7574d88fa    http://yxshu.free.idcfengye.com/default.aspx
+http://www.ngrok.cc/   
+客户端ID：7b443fb7574d88fa  
+客户端地址：http://yxshu.free.idcfengye.com/default.aspx
 
 其中vs如果用IP地址访问的话，需要进行配置：
 1、打开两个地方的applicationhost.config（
