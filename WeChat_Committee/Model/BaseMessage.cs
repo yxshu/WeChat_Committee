@@ -79,7 +79,7 @@ namespace WeChat_Committee.Model
             StringBuilder resxml = new StringBuilder(string.Format("<xml><ToUserName><![CDATA[{0}]]></ToUserName><FromUserName><![CDATA[{1}]]></FromUserName><CreateTime>{2}</CreateTime>", FromUserName, ToUserName, Common.ConvertDateTimeInt(DateTime.Now)));
             resxml.Append(" <MsgType><![CDATA[music]]></MsgType>");
             resxml.AppendFormat("<Music><Title><![CDATA[{0}]]></Title><Description><![CDATA[{1}]]></Description>", mu.Title, mu.Description);
-            resxml.AppendFormat("<MusicUrl><![CDATA[http://{0}{1}]]></MusicUrl><HQMusicUrl><![CDATA[http://{2}{3}]]></HQMusicUrl></Music><FuncFlag>0</FuncFlag></xml>", VqiRequest.GetCurrentFullHost(), mu.MusicUrl, VqiRequest.GetCurrentFullHost(), mu.HQMusicUrl);
+            resxml.AppendFormat("<MusicUrl><![CDATA[http://{0}{1}]]></MusicUrl><HQMusicUrl><![CDATA[http://{2}{3}]]></HQMusicUrl></Music><FuncFlag>0</FuncFlag></xml>", HttpContext.Current.Request.UserHostName, mu.MusicUrl, HttpContext.Current.Request.UserHostName, mu.HQMusicUrl);
             Response(param, resxml.ToString());
         }
         /// <summary>
@@ -124,7 +124,7 @@ namespace WeChat_Committee.Model
         {
             StringBuilder resxml = new StringBuilder(string.Format("<xml><ToUserName><![CDATA[{0}]]></ToUserName><FromUserName><![CDATA[{1}]]></FromUserName><CreateTime>{2}</CreateTime>", FromUserName, ToUserName, Common.ConvertDateTimeInt(DateTime.Now)));
             resxml.Append(" <MsgType><![CDATA[image]]></MsgType>");
-            resxml.AppendFormat("<PicUrl><![CDATA[{0}]]></PicUrl></xml>", domain + pic.PictureUrl);
+            resxml.AppendFormat("<Image><MediaId><![CDATA[{0}]]></MediaId></Image></xml>", domain + pic.media_id);
             Response(param, resxml.ToString());
         }
 
@@ -162,11 +162,12 @@ namespace WeChat_Committee.Model
             for (int i = 0; i < art.Count; i++)
             {
                 resxml.AppendFormat("<item><Title><![CDATA[{0}]]></Title>  <Description><![CDATA[{1}]]></Description>", art[i].Title, art[i].Description);
-                resxml.AppendFormat("<PicUrl><![CDATA[{0}]]></PicUrl><Url><![CDATA[{1}]]></Url></item>", art[i].PicUrl.Contains("http://") ? art[i].PicUrl : "http://" + VqiRequest.GetCurrentFullHost() + art[i].PicUrl, art[i].Url.Contains("http://") ? art[i].Url : "http://" + VqiRequest.GetCurrentFullHost() + art[i].Url);
+                resxml.AppendFormat("<PicUrl><![CDATA[{0}]]></PicUrl><Url><![CDATA[{1}]]></Url></item>", art[i].PicUrl.Contains("http://") ? art[i].PicUrl : "http://" + HttpContext.Current.Request.UserHostName + art[i].PicUrl, art[i].Url.Contains("http://") ? art[i].Url : "http://" + HttpContext.Current.Request.UserHostName + art[i].Url);
             }
             resxml.Append("</Articles><FuncFlag>0</FuncFlag></xml>");
             Response(param, resxml.ToString());
         }
+
         /// <summary>
         /// 多客服转发
         /// </summary>
@@ -179,6 +180,7 @@ namespace WeChat_Committee.Model
             resxml.AppendFormat("<MsgType><![CDATA[transfer_customer_service]]></MsgType></xml>");
             Response(param, resxml.ToString());
         }
+
         /// <summary>
         /// 多客服转发如果指定的客服没有接入能力(不在线、没有开启自动接入或者自动接入已满)，该用户会一直等待指定客服有接入能力后才会被接入，而不会被其他客服接待。建议在指定客服时，先查询客服的接入能力指定到有能力接入的客服，保证客户能够及时得到服务。
         /// </summary>
@@ -192,12 +194,13 @@ namespace WeChat_Committee.Model
             resxml.AppendFormat("<MsgType><![CDATA[transfer_customer_service]]></MsgType><TransInfo><KfAccount>{0}</KfAccount></TransInfo></xml>", KfAccount);
             Response(param, resxml.ToString());
         }
+
         private void Response(EnterParam param, string data)
         {
             if (param.IsAes)
             {
                 var wxcpt = new MsgCrypt(param.token, param.EncodingAESKey, param.appid);
-                wxcpt.EncryptMsg(data, Common.ConvertDateTimeInt(DateTime.Now).ToString(), Utils.GetRamCode(), ref data);
+                wxcpt.EncryptMsg(data, Common.ConvertDateTimeInt(DateTime.Now).ToString(), HttpContext.Current.Request.QueryString["nonce"], ref data);
             }
             Common.ResponseWrite(data);
 

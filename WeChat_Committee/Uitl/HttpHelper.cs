@@ -12,6 +12,7 @@ namespace WeChat_Committee.Uitl
 {
     public class HttpHelper
     {
+
         /// <summary>
         /// 创建GET方式的HTTP请求  
         /// </summary>
@@ -46,6 +47,7 @@ namespace WeChat_Committee.Uitl
             }
             return request.GetResponse() as HttpWebResponse;
         }
+
         /// <summary>
         /// 创建POST方式的HTTP请求  
         /// </summary>

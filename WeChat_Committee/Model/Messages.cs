@@ -141,6 +141,13 @@ namespace WeChat_Committee.Model
         public string media_id { get; set; }
         public string description { get; set; }
     }
+    /// <summary>
+    /// 成功上传图片以后，微信公众号服务器返回的数据转化为实体对象
+    /// </summary>
+    public class Picture
+    {
+        public string media_id { get; set; }
+    }
 
     /// <summary>
     /// BaseMessage.ResArticles(EnterParam param, List<Articles> art)中的Articles类

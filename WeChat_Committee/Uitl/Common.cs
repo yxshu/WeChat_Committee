@@ -23,7 +23,6 @@ namespace WeChat_Committee.Uitl
         /// 上传多媒体的接口地址是：http://file.api.weixin.qq.com/cgi-bin/media/upload?access_token=ACCESS_TOKEN&type=TYPE
         /// 其中access_token为调用接口凭证，type是媒体文件类型，分别有图片（image）、语音（voice）、视频（video）和缩略图（thumb）
         /// 上传的多媒体文件有格式和大小限制，如下：
-
         ///图片（image）: 1M，支持JPG格式
         ///语音（voice）：2M，播放长度不超过60s，支持AMR\MP3格式
         ///视频（video）：10MB，支持MP4格式
@@ -49,6 +48,10 @@ namespace WeChat_Committee.Uitl
             }
         }
 
+        /// <summary>
+        /// 简单的写日志操作
+        /// </summary>
+        /// <param name="exceptionmessage"></param>
         private static void WriteBug(string exceptionmessage)
         {
             string path = string.Empty;
@@ -84,15 +87,16 @@ namespace WeChat_Committee.Uitl
         }
 
         /// <summary>
+        /// 解析微信公众号发送的XML数据，以基类的形式返回对应的实体对象
         /// 数据包（如加密，需解密后传入），以基类的形式返回对应的实体。
         /// </summary>
         /// <param name="param"></param>
         /// <param name="bug"></param>
         /// <returns></returns>
-        public static BaseMessage Load(EnterParam param, bool bug = true)
+        public static BaseMessage getMessageModelFromRequestXML(EnterParam param, bool bug = true)
         {
             string postStr = "";
-            Stream s = VqiRequest.GetInputStream();//此方法是对System.Web.HttpContext.Current.Request.InputStream的封装，可直接代码
+            Stream s = HttpContext.Current.Request.InputStream;//此方法是对System.Web.HttpContext.Current.Request.InputStream的封装，可直接代码
             byte[] b = new byte[s.Length];
             s.Read(b, 0, (int)s.Length);
             postStr = Encoding.UTF8.GetString(b);//获取微信服务器推送过来的字符串
@@ -101,10 +105,10 @@ namespace WeChat_Committee.Uitl
             ///由于在实际的运营中，兼容模式不太可能使用，所以在此不做详细介绍了。
             ///获取到url中的参数后，判断encrypt_type的值是否为aes，如果是则说明是使用的兼容模式或安全模式，此时则需调用解密相关的方法进行解密。
             ///则则直接解析接收到的xml字符串。
-            var timestamp = VqiRequest.GetQueryString("timestamp");
-            var nonce = VqiRequest.GetQueryString("nonce");
-            var msg_signature = VqiRequest.GetQueryString("msg_signature");
-            var encrypt_type = VqiRequest.GetQueryString("encrypt_type");
+            var timestamp = HttpContext.Current.Request.QueryString["timestamp"];
+            var nonce = HttpContext.Current.Request.QueryString["nonce"];
+            var msg_signature = HttpContext.Current.Request.QueryString["msg_signature"];
+            var encrypt_type = HttpContext.Current.Request.QueryString["encrypt_type"];
             string data = "";
             if (encrypt_type == "aes")//加密模式处理
             {
@@ -125,7 +129,7 @@ namespace WeChat_Committee.Uitl
             }
             if (bug)
             {
-               WriteBug(data);
+                WriteBug(data);
             }
             return MessageFactory.CreateMessage(data);
         }
@@ -181,14 +185,15 @@ namespace WeChat_Committee.Uitl
         ///本接口与自定义菜单查询接口的不同之处在于，本接口无论公众号的接口是如何设置的，都能查询到接口，而自定义菜单查询接口则仅能查询到使用API设置的菜单配置。
         ///认证/未认证的服务号/订阅号，以及接口测试号，均拥有该接口权限。
         ///从第三方平台的公众号登录授权机制上来说，该接口从属于消息与菜单权限集。
-        //本接口中返回的图片/语音/视频为临时素材（临时素材每次获取都不同，3天内有效，通过素材管理-获取临时素材接口来获取这些素材），本接口返回的图文消息为永久素材素材（通过素材管理-获取永久素材接口来获取这些素材）。
-
+        ///本接口中返回的图片/语音/视频为临时素材（临时素材每次获取都不同，3天内有效，通过素材管理-获取临时素材接口来获取这些素材），
+        ///本接口返回的图文消息为永久素材素材（通过素材管理-获取永久素材接口来获取这些素材）。
         /// </summary>
         /// <returns></returns>
         public static void querySelfmenuInfo()
         {
             ///https://www.cnblogs.com/zskbll/p/4164079.html
         }
+
         /// <summary>
         /// 首先从数据库中查询最近的access_token,如果没有过期（有效期超过5分钟为准），则直接返回
         /// 如果不存在，或者已经过期，则重新申请access_token并将其写入数据库
@@ -264,7 +269,6 @@ namespace WeChat_Committee.Uitl
         /// <param name="context">微信服务器发送的Get请求上下文对象</param>
         /// <param name="result">输出参数，验证是否成功的标识</param>
         /// <returns>返回一个string，用于回复，成功则按要求返回echoString，不成功则返回null</returns>
-
         public static string ConfigURL(HttpContext context, out bool result)
         {
             string token = ConfigurationManager.AppSettings["token"];
@@ -297,7 +301,6 @@ namespace WeChat_Committee.Uitl
         /// <param name="timestamp"></param>
         /// <param name="nonce"></param>
         /// <returns></returns>
-
         private static bool checkSignature(string token, string signature, string timestamp, string nonce)
         {
             string[] ArrTmp = { token, timestamp, nonce };
@@ -311,6 +314,7 @@ namespace WeChat_Committee.Uitl
             }
             else { return false; }
         }
+
         /// <summary>
         /// 向配置文件的AppSetting字段内写入内容
         /// </summary>
@@ -336,11 +340,16 @@ namespace WeChat_Committee.Uitl
             return result;
         }
 
+        /// <summary>
+        /// 向输出流中写出内容
+        /// </summary>
+        /// <param name="str"></param>
         public static void ResponseWrite(string str)
         {
             HttpContext.Current.Response.Write(str);
             HttpContext.Current.Response.End();
         }
+
         /// <summary>
         /// 表示1970年1月1日0时0分0秒至输入时间所间隔的秒数
         /// </summary>

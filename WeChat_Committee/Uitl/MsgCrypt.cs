@@ -102,14 +102,15 @@ namespace WeChat_Committee.Uitl
                 return (int)WXBizMsgCryptErrorCode.WXBizMsgCrypt_ValidateAppid_Error;
             return 0;
         }
+        /// <summary>
+        ///将企业号回复用户的消息加密打包
+        /// </summary>
+        /// <param name="sReplyMsg">业号待回复用户的消息，xml格式的字符串</param>
+        /// <param name="sTimeStamp"时间戳，可以自己生成，也可以用URL参数的timestamp></param>
+        /// <param name="sNonce">随机串，可以自己生成，也可以用URL参数的nonce</param>
+        /// <param na成功0，失败返回对应的错误码me="sEncryptMsg">加密后的可以直接回复用户的密文，包括msg_signature, timestamp, nonce, encrypt的xml格式的字符串,当return返回0时有效</param>
+        /// <returns></returns>
 
-        //将企业号回复用户的消息加密打包
-        // @param sReplyMsg: 企业号待回复用户的消息，xml格式的字符串
-        // @param sTimeStamp: 时间戳，可以自己生成，也可以用URL参数的timestamp
-        // @param sNonce: 随机串，可以自己生成，也可以用URL参数的nonce
-        // @param sEncryptMsg: 加密后的可以直接回复用户的密文，包括msg_signature, timestamp, nonce, encrypt的xml格式的字符串,
-        //                        当return返回0时有效
-        // return：成功0，失败返回对应的错误码
         public int EncryptMsg(string sReplyMsg, string sTimeStamp, string sNonce, ref string sEncryptMsg)
         {
             if (m_sEncodingAESKey.Length != 43)
